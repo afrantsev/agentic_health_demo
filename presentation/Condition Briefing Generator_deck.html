@@ -1,0 +1,436 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Condition Briefing Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<style>
+  :root {
+    --ground: #e8ecf1;
+    --paper: #ffffff;
+    --ink: #16202b;
+    --muted: #5f6b7a;
+    --rule: #e2e5ea;
+    --accent: #1b5e9e;
+    --accent-ink: #154b80;
+    --accent-soft: #eaf1f8;
+    --panel: #f4f7fa;
+
+    --display: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
+    --body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #0d1319;
+      --paper: #141c25;
+      --ink: #e5ebf1;
+      --muted: #97a4b3;
+      --rule: #263240;
+      --accent: #74aee6;
+      --accent-ink: #9cc6ef;
+      --accent-soft: #1a2c3f;
+      --panel: #18222d;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #0d1319;
+    --paper: #141c25;
+    --ink: #e5ebf1;
+    --muted: #97a4b3;
+    --rule: #263240;
+    --accent: #74aee6;
+    --accent-ink: #9cc6ef;
+    --accent-soft: #1a2c3f;
+    --panel: #18222d;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.55;
+    padding-inline: 16px;
+    padding-block: 32px 48px;
+  }
+
+  .sheet {
+    max-width: 960px;
+    margin: 0 auto;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: clamp(24px, 5vw, 56px);
+    display: grid;
+    gap: 40px;
+  }
+
+  h1, h2, h3, p { margin: 0; }
+
+  .label {
+    font-family: var(--body);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Masthead */
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .product {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 17px;
+  }
+
+  /* Hero */
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 40px;
+    align-items: start;
+  }
+  .hero-copy { display: grid; gap: 18px; }
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(30px, 4.4vw, 42px);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .lede {
+    font-size: 17px;
+    color: var(--ink);
+    max-width: 58ch;
+  }
+
+  .proof {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
+  }
+  .proof div { display: grid; gap: 4px; align-content: start; }
+  .proof strong {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+  }
+  .proof strong small {
+    font-size: 16px;
+    font-weight: 600;
+    margin-left: 2px;
+  }
+  .proof span { font-size: 13px; color: var(--muted); line-height: 1.45; }
+
+  /* Real-briefing excerpt */
+  .excerpt {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 20px;
+    display: grid;
+    gap: 14px;
+  }
+  .excerpt-head { display: grid; gap: 2px; }
+  .excerpt-head h2 {
+    font-family: var(--display);
+    font-size: 19px;
+    font-weight: 700;
+  }
+  .excerpt ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+  .excerpt li {
+    display: grid;
+    gap: 4px;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+  }
+  .excerpt .kind {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .excerpt .claim { font-size: 14px; line-height: 1.45; }
+  .excerpt .claim b { font-weight: 600; }
+  .id {
+    justify-self: start;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-decoration: none;
+  }
+  a.id:hover { text-decoration: underline; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .excerpt .tally {
+    font-size: 13px;
+    color: var(--muted);
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+  }
+
+  /* Sections */
+  .block { display: grid; gap: 18px; }
+  .block > h2 {
+    font-family: var(--display);
+    font-size: 24px;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+  .sections {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .sections > div {
+    padding: 18px 18px 18px 0;
+    display: grid;
+    gap: 8px;
+    align-content: start;
+  }
+  .sections > div + div {
+    padding-left: 18px;
+    border-left: 1px solid var(--rule);
+  }
+  .sections h3 { font-size: 15px; font-weight: 600; }
+  .sections p { font-size: 14px; color: var(--ink); }
+  .sections .src {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--accent-ink);
+  }
+
+  /* Benefits */
+  .benefits {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px 32px;
+  }
+  .benefits div { display: grid; gap: 6px; align-content: start; }
+  .benefits h3 {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+    padding-top: 12px;
+    border-top: 2px solid var(--accent);
+  }
+  .benefits p { font-size: 14px; color: var(--muted); }
+
+  /* Footer band */
+  .band {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+    padding-top: 24px;
+    border-top: 2px solid var(--ink);
+  }
+  .band div { display: grid; gap: 8px; align-content: start; }
+  .band ul {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 4px;
+    font-size: 14px;
+  }
+  .band p { font-size: 14px; }
+  .band .ui {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    padding: 1px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; }
+    .sections { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .sections > div:nth-child(3) { padding-left: 0; border-left: 0; }
+    .sections > div:nth-child(n+3) { border-top: 1px solid var(--rule); }
+    .benefits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .band { grid-template-columns: 1fr; gap: 24px; }
+  }
+  @media (max-width: 560px) {
+    body { padding-block: 16px 32px; }
+    .proof { grid-template-columns: 1fr; gap: 14px; }
+    .sections { grid-template-columns: 1fr; }
+    .sections > div, .sections > div + div { padding: 16px 0; border-left: 0; }
+    .sections > div + div { border-top: 1px solid var(--rule); }
+    .benefits { grid-template-columns: 1fr; gap: 22px; }
+  }
+</style>
+
+<main class="sheet">
+  <header class="masthead">
+    <span class="product">Condition Briefing Generator</span>
+    <span class="label">Brief for health system strategy teams · September 2026</span>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>Type a condition. Get a sourced strategy briefing in <em>about 25 seconds.</em></h1>
+      <p class="lede">
+        The Condition Briefing Generator reads current guidelines, recent reviews and live trial registries, then
+        writes a four-part briefing for leaders who need the landscape fast. Every citation links to its PubMed or
+        ClinicalTrials.gov record, so you can check any claim in one click.
+      </p>
+      <div class="proof">
+        <div>
+          <strong>~25<small>s</small></strong>
+          <span>From condition name to finished briefing. Test runs took 21 to 27 seconds.</span>
+        </div>
+        <div>
+          <strong>4</strong>
+          <span>Sections researched side by side: overview, standard of care, pipeline and key players.</span>
+        </div>
+        <div>
+          <strong>0</strong>
+          <span>Invented citations. Every PMID and NCT ID matched a retrieved record across four test conditions.</span>
+        </div>
+      </div>
+    </div>
+
+    <aside class="excerpt" aria-label="Excerpt from a real briefing">
+      <div class="excerpt-head">
+        <span class="label">From a real briefing</span>
+        <h2>Type 2 Diabetes</h2>
+      </div>
+      <ul>
+        <li>
+          <span class="kind">Key fact</span>
+          <span class="claim"><b>US prevalence:</b> approximately 1 in 6 adults</span>
+          <a class="id" href="https://pubmed.ncbi.nlm.nih.gov/40549398/" target="_blank" rel="noreferrer">PMID 40549398</a>
+        </li>
+        <li>
+          <span class="kind">Emerging treatment</span>
+          <span class="claim"><b>VK2735</b>, a dual GLP-1 and glucagon receptor agonist in Phase 3, sponsored by Viking Therapeutics</span>
+          <a class="id" href="https://clinicaltrials.gov/study/NCT07104383" target="_blank" rel="noreferrer">NCT07104383</a>
+        </li>
+        <li>
+          <span class="kind">Key player</span>
+          <span class="claim"><b>Eli Lilly and Company:</b> 18 active trials, led by tirzepatide and oral GLP-1 programs</span>
+          <span class="id">ClinicalTrials.gov sponsor count</span>
+        </li>
+      </ul>
+      <p class="tally">This briefing drew on 61 records: 22 PubMed articles, 15 active trials and 24 trial sponsors. Generated in 26.6 seconds.</p>
+    </aside>
+  </section>
+
+  <section class="block">
+    <h2>What every briefing covers</h2>
+    <div class="sections">
+      <div>
+        <h3>Condition overview</h3>
+        <p>What the condition is, who it affects, and what it means for a health system. Headline figures carry their PubMed ID.</p>
+        <span class="src">PubMed reviews, last 5 years</span>
+      </div>
+      <div>
+        <h3>Standard of care</h3>
+        <p>How it is treated today by line of therapy, the guidelines behind that care, and where care still falls short.</p>
+        <span class="src">PubMed practice guidelines, last 5 years</span>
+      </div>
+      <div>
+        <h3>Emerging treatments</h3>
+        <p>The four to eight investigational therapies that matter most, with mechanism, phase, sponsor and likely impact.</p>
+        <span class="src">ClinicalTrials.gov, active Phase 2/3 trials</span>
+      </div>
+      <div>
+        <h3>Companies &amp; institutions</h3>
+        <p>Who is running the research, how many active trials each has, and what that means for partnerships and trial sites.</p>
+        <span class="src">ClinicalTrials.gov sponsors and collaborators</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Why teams rely on it</h2>
+    <div class="benefits">
+      <div>
+        <h3>Skip the desk research</h3>
+        <p>No more hand-searching PubMed and trial registries before a meeting. You start with the landscape already mapped.</p>
+      </div>
+      <div>
+        <h3>Check any claim in one click</h3>
+        <p>Guidelines, facts and therapies link to their source record. A full source list shows which section used each one.</p>
+      </div>
+      <div>
+        <h3>Current by design</h3>
+        <p>Guidelines and reviews come from the last five years. Trials are limited to studies that are recruiting, active or about to start.</p>
+      </div>
+      <div>
+        <h3>Clear about what is sourced</h3>
+        <p>When a figure comes from general knowledge instead of a retrieved article, the briefing labels it that way. Trial counts appear only when the registry supplied them.</p>
+      </div>
+      <div>
+        <h3>Written for decision-makers</h3>
+        <p>Plain-language executive summaries, no marketing tone, and strategic notes on partners, trial sites and competitors.</p>
+      </div>
+      <div>
+        <h3>Tested before you see it</h3>
+        <p>An automated evaluation runs 13 checks on real briefings, from citation tracing to clinical keywords and speed. Every check passed for all four test conditions.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="band">
+    <div>
+      <span class="label">Use it for</span>
+      <ul>
+        <li>Service-line and portfolio planning</li>
+        <li>Preparing for pharma and research partner meetings</li>
+        <li>Leadership and board briefings</li>
+        <li>Spotting trial-site opportunities</li>
+      </ul>
+    </div>
+    <div>
+      <span class="label">Keep in mind</span>
+      <ul>
+        <li>Built for strategy discussion, not clinical decisions or patient care</li>
+        <li>Check key points against the linked primary sources</li>
+        <li>Each briefing is generated fresh and is not saved yet</li>
+      </ul>
+    </div>
+    <div>
+      <span class="label">Get started</span>
+      <p>Open the app, type any condition or pick an example such as <span class="ui">Multiple Sclerosis</span>, then select <span class="ui">Generate Briefing</span>. Your briefing appears in under half a minute.</p>
+    </div>
+  </footer>
+</main>
+
+</body></html>
