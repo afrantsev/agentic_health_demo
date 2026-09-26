@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+dist/
+.env
+*.local
+backend/eval/results/*
+!backend/eval/results/.gitkeep

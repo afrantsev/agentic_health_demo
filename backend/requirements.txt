@@ -1,0 +1,4 @@
+fastapi>=0.115
+uvicorn[standard]>=0.34
+crewai==1.15.22
+requests>=2.32
